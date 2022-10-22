@@ -1,4 +1,5 @@
-package ru.students.test_rest_service.controller;
+package ru.students.logger.controller;
+
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,26 +9,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import ru.students.test_rest_service.model.Request;
-import ru.students.test_rest_service.model.Response;
-import ru.students.test_rest_service.service.ModifyRequestService;
-import ru.students.test_rest_service.service.MyModifyService;
+import ru.students.logger.model.Request;
+import ru.students.logger.model.Response;
+import ru.students.logger.service.MyModifyService;
 
 @Slf4j
 @RestController
 public class MyController {
     private final MyModifyService myModifyService;
-    private final ModifyRequestService modifyRequestService;
 
     @Autowired
-    public MyController(@Qualifier("ModifyErrorMessage") MyModifyService myModifyService, ModifyRequestService modifyRequestService) {
+    public MyController(@Qualifier("ModifyErrorMessage") MyModifyService myModifyService) {
         this.myModifyService = myModifyService;
-        this.modifyRequestService = modifyRequestService;
     }
 
     @PostMapping(value = "/feedback")
     public ResponseEntity<Response> feedback(@RequestBody Request request) {
-        log.warn("Incoming request: " + request);
+        log.info("Incoming request: " + request);
 
         Response response = Response.builder()
                 .uid(request.getUid())
@@ -38,9 +36,8 @@ public class MyController {
                 .errorMessage("")
                 .build();
 
-        modifyRequestService.modifyMyReq(request);
         Response modifiedResponse = myModifyService.modify(response);
-        log.warn("Outgoing response: " + request);
+        log.info("Outgoing response: " + request);
 
         return new ResponseEntity<>(modifiedResponse, HttpStatus.OK);
     }
